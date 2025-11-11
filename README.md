@@ -5,6 +5,9 @@ A complete **React + TypeScript** application that helps groups of people track 
 Built with **Context + Reducer** for global state management and styled using **TailwindCSS** for a modern, responsive UI.
 
 ---
+Live Demo:
+Live application - https://expense-splitter-teal.vercel.app/
+Source Code - Available in this repository
 
 ##  Getting Started
 
@@ -236,7 +239,7 @@ src/
 ##  Run Locally
 
 ```bash
-git clone <your_repo_link>
+git clone https://github.com/nidhi041/expense-splitter.git
 cd expense-splitter-challenge
 npm install
 npm install date-fns
