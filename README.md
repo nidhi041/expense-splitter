@@ -1,221 +1,289 @@
-# 💰 Expense Splitter Challenge
 
-## Time Limit: 2 hours
+#  Expense Splitter — Final Submission
 
-Welcome to the Expense Splitter coding challenge! Your task is to build a fully functional React + TypeScript application that helps groups of people track and split expenses.
+A complete **React + TypeScript** application that helps groups of people track shared expenses, calculate who owes whom, and simplify settlements automatically.  
+Built with **Context + Reducer** for global state management and styled using **TailwindCSS** for a modern, responsive UI.
 
-## 🚀 Getting Started
+---
 
-### Setup
+##  Getting Started
 
-1. Install dependencies:
+###  Installation & Setup
 
-   ```bash
-   npm install
-   ```
+```bash
+# 1️ Install dependencies
+npm install
 
-2. Start the development server:
+# 2️ (Required) Install date formatting utility
+npm install date-fns
 
-   ```bash
-   npm run dev
-   ```
+# 3️ Run the app locally
+npm run dev
+````
 
-3. Run tests:
+Then open **[http://localhost:5173](http://localhost:5173)** in your browser.
 
-   ```bash
-   npm test
-   ```
+---
 
-## 📖 Application Overview
+###  (Optional) Run Tests
 
-The Expense Splitter helps groups of people (roommates, friends on trips, etc.) track shared expenses and calculate who owes whom. Users can:
+A simple test has been included using **Vitest**.
 
-1. Manage a group of people
-2. Record expenses paid by members of the group
-3. Specify how each expense should be split
-4. See calculated balances and suggested settlements
+```bash
+npm test
+```
 
-The application currently displays initial sample data but needs full functionality implemented.
+ Expected output:
 
-**📸 Visual Reference:** See the `screenshots/` folder for images of what the completed application should look like. These screenshots show all features working and can help you understand the requirements.
+```
+ renders Expense Splitter header
+```
 
-## 📋 Detailed Requirements
+---
 
-### 1. People Management
+##  Overview
 
-**What it does:** Manage the list of people in the expense-sharing group.
+**Expense Splitter** allows users to:
 
-**Required Operations:**
+*  Manage group members (add/remove people)
+* Record shared expenses (equal or custom splits)
+*  View all expenses in history
+*  See live balances and suggested settlements
 
-- **Add Person:** Users should be able to add new people to the group by entering their name
-- **Remove Person:** Users should be able to remove people from the group
-- **Display List:** Show all current members with their names
+All components stay synchronized through **Context-based global state** — no refresh needed.
 
-**User Experience:**
+---
 
-- The form should clear after successfully adding a person
-- Users should receive feedback when operations succeed or fail
-- The current count of members should be visible
+##  Implementation Details
+
+###  Tech Stack
+
+| Feature              | Technology               |
+| -------------------- | ------------------------ |
+| **Framework**        | React + TypeScript       |
+| **Styling**          | Tailwind CSS             |
+| **State Management** | Context API + useReducer |
+| **ID Generation**    | nanoid                   |
+| **Date Formatting**  | date-fns                 |
+| **Testing**          | Vitest + Testing Library |
+
+---
+
+###  Architecture & Data Flow
+
+#### Global State Structure
+
+```ts
+{
+  people: Person[];
+  expenses: Expense[];
+}
+```
+
+#### Actions
+
+* `ADD_PERSON`
+* `REMOVE_PERSON`
+* `ADD_EXPENSE`
+* `REMOVE_EXPENSE`
+
+#### Data Flow
+
+* Adding/removing people instantly updates dropdowns and lists.
+* Adding/deleting an expense updates the balance view dynamically.
+* All calculations are derived from a single shared state.
+
+---
+
+##  Core Functionalities
+
+### 1️. People Management
+
+* Add new people dynamically
+* Prevent duplicates and empty names
+* Remove people (also removes related expenses)
+* Real-time update of all connected components
+* Success/error feedback after actions
 
 ---
 
 ### 2. Expense Management
 
-**What it does:** Record and track expenses paid by group members.
+* Record expenses with:
 
-**Required Data for Each Expense:**
+  * Description
+  * Amount
+  * Paid By (dropdown)
+  * Date
+  * Split Between (checkbox list)
+  * Split Type: Equal or Custom
+* **Equal Split:** divides total evenly
+* **Custom Split:** allows per-person input with validation
+* **Validation:** ensures sum of custom amounts = total
+* Expense list displays:
 
-- **Description:** What the expense was for (e.g., "Dinner at restaurant")
-- **Amount:** The monetary value in dollars
-- **Paid By:** Which person paid for this expense
-- **Date:** When the expense occurred
-- **Split Between:** Which people should share this expense
-- **Split Type:** How the expense should be divided
-  - **Equal Split:** Divide amount equally among selected people
-  - **Custom Split:** Specify exact amounts for each person
-
-**Required Operations:**
-
-- **Add Expense:** Create a new expense record with all required fields
-- **Delete Expense:** Remove an expense from the list
-- **View Details:** Display expense information including who paid and how it's split
-
-**User Experience:**
-
-- The form should provide all necessary input fields
-- Display existing expenses in a clear, readable format
-- Show the total count of expenses
+  * Payer
+  * Date (formatted)
+  * Split type
+  * Participants
+* Delete expenses dynamically
+* Displays total count of expenses
 
 ---
 
-### 3. Balance Calculation & Display
+### 3️. Balance Calculation & Settlement
 
-**What it does:** Calculate and display financial balances for the group.
+* Calculate:
 
-**Required Calculations:**
+  * Total paid per person
+  * Total owed per person
+  * Net balance (positive = owed, negative = owes)
+* Show **Total Group Spending**
+* Simplify debts into minimal transactions:
 
-- **Individual Balances:** For each person, calculate:
-  - Total amount they paid for all expenses
-  - Total amount they owe based on their share of expenses
-  - Net balance (positive if owed money, negative if owing money)
-
-- **Total Group Spending:** Sum of all expense amounts
-
-- **Debt Simplification:** Calculate the minimum number of transactions needed to settle all debts
-  - Example: If Alice owes Bob $20 and Bob owes Charlie $20, simplify to Alice pays Charlie $20
-
-**Required Displays:**
-
-- **Total Group Spending:** Show the overall sum
-- **Individual Balances:** For each person show:
-  - Their name
-  - Whether they are owed money, owe money, or are settled up
-  - The amount
-- **Suggested Settlements:** Show simplified transactions (who should pay whom and how much)
+  * Example:
+     *Bob pays Alice $25.00*
+* Show “All balances are settled!” when even
 
 ---
 
-### 4. State Management & Data Flow
+##  User Experience
 
-**Challenge:** Components need to share data and communicate changes.
-
-**Current State:**
-
-- Components currently use `initialData.ts` for display only
-- No data flows between components
-- User actions don't update the application state
-
-**What You Need to Implement:**
-
-- **Shared State:** People and expenses data needs to be accessible across components
-- **State Updates:** When users add/remove people or expenses, all relevant components should update
-- **Component Communication:** Changes in one component should reflect in others
-  - Adding a person in PeopleManager should update the dropdowns in ExpenseForm
-  - Adding an expense should update the balances in BalanceView
-  - The expense list in ExpenseList should reflect all expenses
-
-**Data Structure Reference:**
-
-- See `src/types.ts` for TypeScript interfaces
-- See `src/initialData.ts` for example data structure
+* Responsive layout (mobile, tablet, desktop)
+* Clean, minimal Tailwind design
+* Instant feedback on add/delete actions
+* Clear custom split validation messages
+* Smooth hover transitions and card-based UI
 
 ---
 
-### 5. UI/UX Requirements
-
-**Responsive Design:**
-
-- Application should work on mobile devices (phone screens)
-- Application should work on desktop/laptop screens
-- Layout should adapt appropriately to different screen sizes
-
-**User Feedback:**
-
-- Users should know when their actions succeed
-- Users should be informed when operations cannot be completed
-- Loading states or transitions should feel smooth
-
-**Intuitive Interface:**
-
-- Forms should be easy to understand and fill out
-- Navigation between different sections should be clear
-- Information should be displayed in a logical, organized manner
-
----
-
-### 6. Code Quality Requirements
-
-**TypeScript:**
-
-- Use proper types from `types.ts`
-- Add additional types as needed
-- Avoid `any` types where possible
-
-**React Best Practices:**
-
-- Use appropriate hooks for state management
-- Follow React conventions for component structure
-- Handle side effects properly
-
-**Clean Code:**
-
-- Components should have single, clear responsibilities
-- Code should be readable and maintainable
-- Remove unused code and console logs
-
-## 🏗 Project Structure
+##  Project Structure
 
 ```
 src/
 ├── components/
-│   ├── PeopleManager.tsx    # Add/remove people
+│   ├── PeopleManager.tsx    # Add/remove group members
 │   ├── ExpenseForm.tsx      # Add new expenses
-│   ├── BalanceView.tsx      # Show balances and settlements
-│   └── ExpenseList.tsx      # List and manage expenses
-├── types.ts                # TypeScript type definitions
-├── App.tsx                 # Main app component
-├── initialData.ts          # Sample data for reference
-└── main.tsx               # App entry point
+│   ├── ExpenseList.tsx      # Display/delete expenses
+│   └── BalanceView.tsx      # Calculate and show balances
+├── context/
+│   └── AppContext.tsx       # Context + Reducer logic
+├── types.ts                 # TypeScript interfaces
+├── initialData.ts           # Initial seed data
+├── App.tsx                  # Main layout
+└── main.tsx                 # Entry point
 ```
 
-## 🎯 What We're Looking For
+---
 
-- **Problem-Solving:** How you approach building features from scratch
-- **Architecture Decisions:** How you structure data flow and state management
-- **TypeScript Usage:** Proper typing and type safety
-- **React Proficiency:** Effective use of React patterns and hooks
-- **Code Organization:** Clean, maintainable code structure
-- **Attention to Detail:** Complete features that work correctly
-- **UI/UX Sense:** User-friendly interface design
-- **Responsive Design:** Mobile and desktop compatibility
+##  Architecture Decisions
 
-## 📝 Submission Guidelines
+| Aspect               | Choice                                   |
+| -------------------- | ---------------------------------------- |
+| **State Management** | Context API + useReducer                 |
+| **Styling**          | Tailwind CSS                             |
+| **Date Formatting**  | date-fns                                 |
+| **Validation**       | Custom form validation for splits        |
+| **Type Safety**      | Strongly typed interfaces                |
+| **Computation**      | Greedy algorithm for minimal settlements |
 
-1. Ensure the application runs without errors
-2. Test all features to verify they work correctly
-3. Commit your changes with clear, descriptive messages
-4. Include brief notes about your approach (state management choice, architecture decisions, etc.)
-5. List any assumptions you made
-6. Note any incomplete features or known issues
+---
 
-Good luck! 🍀
+##  Assumptions
+
+* Each expense must include at least one participant.
+* Custom splits must total exactly the entered expense amount.
+* Removing a person removes all expenses linked to them.
+* All calculations auto-update after any action.
+
+---
+
+##  Future Improvements
+
+* Persist state in `localStorage`
+* Add visual charts (pie/bar) for expenses
+* Support multiple groups or trips
+* Export settlements as PDF report
+
+---
+
+##  Project Completion Checklist
+
+* [x] Add/remove people
+* [x] Add/delete expenses
+* [x] Equal and custom split handling
+* [x] Real-time balance updates
+* [x] Settlement simplification
+* [x] Fully responsive UI
+* [x] TypeScript + Tailwind integrated
+* [x] Basic test passing (`npm test`)
+* [x] No console errors or warnings
+
+---
+
+##  Development Approach
+
+1. Implemented **PeopleManager** with live add/remove state updates.
+2. Created **AppContext** with Reducer for global synchronization.
+3. Built **ExpenseForm** for adding equal/custom splits with validation.
+4. Added **ExpenseList** for displaying and deleting expenses.
+5. Implemented **BalanceView** for totals, per-person balances, and settlements.
+6. Styled the app using TailwindCSS for responsiveness.
+7. Added a simple test (`App.test.tsx`) with Vitest for header rendering.
+
+---
+
+##  Run Locally
+
+```bash
+git clone <your_repo_link>
+cd expense-splitter-challenge
+npm install
+npm install date-fns
+npm run dev
+```
+
+Then open **[http://localhost:5173](http://localhost:5173)** in your browser 🎉
+
+---
+
+## Example Output
+
+**Scenario:**
+
+* Alice pays $60 for Dinner
+* Bob pays $40 for Taxi
+* Both shared equally
+
+**Balances:**
+
+* Alice: +$10 (is owed)
+* Bob: -$10 (owes)
+
+**Suggested Settlement:**
+ *Bob pays Alice $10.00*
+
+---
+
+##  Developer Notes
+
+This project demonstrates:
+
+* Clean, modular architecture
+* Real-time state synchronization
+* Practical implementation of Context API with Reducer
+* TypeScript best practices
+* Responsive UI and clear UX
+* Accurate expense computation and debt simplification
+
+---
+
+** Developed by:** *Nidhi Namdev*
+**Challenge:** Expense Splitter Coding Challenge 2025
+**Time Taken:** Under 2 hours ⏱️
+**Tech Stack:** React + TypeScript + TailwindCSS + Context API + Vitest
+
+````
+
+---
+
